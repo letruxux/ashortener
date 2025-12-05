@@ -1,43 +1,54 @@
-import { Elysia, file } from "elysia";
+import { Elysia } from "elysia";
 import { generateShort, shorturlSchema, validUrlSchema } from "./hash";
 import { env } from "./env";
 import { getUrl, setUrl } from "./db";
-import path from "path";
 import cors from "@elysiajs/cors";
 
-console.log(path.join(process.cwd(), "dist"));
+const isDev = process.argv.includes("--dev");
 
-new Elysia()
-  .use(cors())
-  .get("/", file("dist/index.html"))
-  .post("/", async ({ body }) => {
-    const { success, data } = validUrlSchema.safeParse(body);
-    if (!success) return new Response(null, { status: 400 });
+const app = new Elysia();
 
-    const short = await generateShort(data.url);
-    setUrl(short, data.url);
+if (isDev) app.use(cors());
 
-    return new Response(JSON.stringify({ url: env.SITE_URL + short }), { status: 200 });
+app.get(
+  "/",
+  new Response(await Bun.file("dist/index.html").text(), {
+    headers: { "Content-Type": "text/html" },
   })
-  .get("/:id", ({ params: { id: _id } }) => {
-    const { success, data: id } = shorturlSchema.safeParse(_id);
-    if (!success) return new Response(null, { status: 400 });
+);
 
-    const url = getUrl(id);
-    if (!url) return new Response(null, { status: 404 });
+app.post("/", async ({ body }) => {
+  const { success, data } = validUrlSchema.safeParse(body);
+  if (!success) return new Response(null, { status: 400 });
 
-    if (_id.endsWith("+")) {
-      return new Response(
-        `<html><body><a href="${env.SITE_URL + id}">${
-          env.SITE_URL + id
-        }</a> redirects to <a href="${url}">${url}</a></body></html>`,
-        { status: 200, headers: { "Content-Type": "text/html" } }
-      );
-    }
+  const short = await generateShort(data.url);
+  setUrl(short, data.url);
 
+  return new Response(JSON.stringify({ url: env.SITE_URL + short }), { status: 200 });
+});
+
+app.get("/:id", ({ params: { id: _id } }) => {
+  const { success, data: id } = shorturlSchema.safeParse(_id);
+  if (!success) return new Response(null, { status: 400 });
+
+  const url = getUrl(id);
+  if (!url) return new Response(null, { status: 404 });
+
+  if (_id.endsWith("+")) {
     return new Response(null, {
-      status: 301,
-      headers: { Location: url },
+      status: 302,
+      headers: {
+        Location: `${env.SITE_URL}?url=${encodeURIComponent(
+          id
+        )}&destination=${encodeURIComponent(url)}`,
+      },
     });
-  })
-  .listen(env.PORT);
+  }
+
+  return new Response(null, {
+    status: 301,
+    headers: { Location: url },
+  });
+});
+
+app.listen(env.PORT);

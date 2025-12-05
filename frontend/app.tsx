@@ -4,7 +4,8 @@ import Spinner from "./spinner";
 import toast from "react-hot-toast";
 import Copy from "./copy";
 
-const API_URL = "http://localhost:3000";
+const API_URL =
+  import.meta.env.NODE_ENV === "development" ? "http://localhost:3000" : "/";
 
 export default function App() {
   const [disabled, setDisabled] = useState(false);
