@@ -3,9 +3,11 @@ import Globe from "./globe";
 import Spinner from "./spinner";
 import toast from "react-hot-toast";
 import Copy from "./copy";
+import Arrow from "./arrow";
 
-const API_URL =
-  import.meta.env.NODE_ENV === "development" ? "http://localhost:3000" : "/";
+console.log();
+
+const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/";
 
 export default function App() {
   const [disabled, setDisabled] = useState(false);
@@ -73,11 +75,15 @@ export default function App() {
         {result && (
           <>
             <p className="mt-8">url shortened!</p>
-            <span className="mt-2 block">
-              <a className="link" href={resultOriginal}>
-                {new URL(resultOriginal).host + new URL(resultOriginal).pathname}
-              </a>{" "}
-              -&gt;{" "}
+            <span className="mt-2 flex items-center gap-2">
+              <a className="link max-w-64 truncate" href={resultOriginal}>
+                {new URL(resultOriginal).host +
+                  new URL(resultOriginal).pathname +
+                  new URL(resultOriginal).search}
+              </a>
+              <span className="text-gray-400">
+                <Arrow />
+              </span>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(result);
