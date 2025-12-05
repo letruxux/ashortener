@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+#root {
+  @apply m-0;
+}

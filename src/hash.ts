@@ -1,4 +1,5 @@
 import z from "zod";
+import { env } from "./env";
 
 const BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -28,5 +29,16 @@ export const shorturlSchema = z
   .regex(/^[0-9a-zA-Z]{6}$/)
   .or(z.string().regex(/^[0-9a-zA-Z]{6}\+$/))
   .transform((s) => s.replace(/\+$/, ""));
+
+const siteHost = new URL(env.SITE_URL).host;
+export const validUrlSchema = z.object({
+  url: z.url({ pattern: /^https?:\/\/.+/ }).refine(
+    (val) => {
+      const host = new URL(val).host;
+      return host !== siteHost;
+    },
+    { message: "url cannot be from " + siteHost }
+  ),
+});
 
 /* literally random stuff just to hope it never collides */

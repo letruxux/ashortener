@@ -1,15 +1,17 @@
-import { Elysia } from "elysia";
-import z from "zod";
-import { generateShort, shorturlSchema } from "./hash";
+import { Elysia, file } from "elysia";
+import { generateShort, shorturlSchema, validUrlSchema } from "./hash";
 import { env } from "./env";
 import { getUrl, setUrl } from "./db";
+import path from "path";
+import cors from "@elysiajs/cors";
+
+console.log(path.join(process.cwd(), "dist"));
 
 new Elysia()
-  .get("/", 'POST / with {"url": "https://abc.com"} to shorten an url')
+  .use(cors())
+  .get("/", file("dist/index.html"))
   .post("/", async ({ body }) => {
-    const { success, data } = z
-      .object({ url: z.url({ pattern: /^https?:\/\/.+/ }) })
-      .safeParse(body);
+    const { success, data } = validUrlSchema.safeParse(body);
     if (!success) return new Response(null, { status: 400 });
 
     const short = await generateShort(data.url);
