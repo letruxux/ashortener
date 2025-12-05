@@ -1,6 +1,8 @@
 import Database from "bun:sqlite";
+import fs from "fs";
 
-const db = new Database("./db.sqlite", { create: true, strict: true });
+if (!fs.existsSync("./db")) fs.mkdirSync("./db");
+const db = new Database("./db/db.sqlite", { create: true, strict: true });
 
 db.run(`
 CREATE TABLE IF NOT EXISTS urls (

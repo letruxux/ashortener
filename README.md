@@ -1,15 +1,6 @@
-# ashortener
-
-To install dependencies:
+# AShortener
 
 ```bash
-bun install
+docker build -t ashortener .
+docker run -d -p 3000:3000 -v /home/king:/app/db ashortener
 ```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.19. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.

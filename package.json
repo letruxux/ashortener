@@ -15,7 +15,8 @@
   "scripts": {
     "build": "vite build",
     "fdev": "vite",
-    "dev": "bun --watch . --dev"
+    "dev": "bun --watch . --dev",
+    "start": "bun run ."
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
