@@ -5,8 +5,6 @@ import toast from "react-hot-toast";
 import Copy from "./copy";
 import Arrow from "./arrow";
 
-console.log();
-
 const API_URL = import.meta.env.DEV ? "http://localhost:3000" : "/";
 
 export default function App() {
